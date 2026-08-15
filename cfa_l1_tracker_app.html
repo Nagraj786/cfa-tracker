@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CFA Level I Tracker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CFA L1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Crect width='64' height='64' rx='13' fill='%23125E4E'/%3E%3Ctext x='50%25' y='60%25' font-family='monospace' font-size='24' font-weight='700' fill='white' text-anchor='middle'%3ECFA%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Crect width='180' height='180' rx='36' fill='%23125E4E'/%3E%3Ctext x='50%25' y='60%25' font-family='monospace' font-size='68' font-weight='700' fill='white' text-anchor='middle'%3ECFA%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --paper:#F6F7F9;--card:#FFFFFF;--ink:#141C26;--soft:#5C6B7F;--rule:#DFE5EC;
+  --pine:#125E4E;--pineSoft:#E6F0ED;--brass:#B07D2B;--brassSoft:#FBF2E0;
+  --rust:#A8442A;--rustSoft:#FAEBE6;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;}
+button{font:inherit;}
+#app{min-height:100vh;}
+.wrap{max-width:560px;margin:0 auto;padding:16px 14px 28px;}
+.eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--soft);}
+.header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;gap:12px;}
+.days-out{font-family:var(--mono);font-size:32px;font-weight:700;letter-spacing:-.04em;line-height:1;}
+.days-out-label{font-size:12px;color:var(--soft);}
+.stat-line{font-family:var(--mono);font-size:11px;color:var(--soft);margin-top:2px;text-align:right;}
+.save-btn{margin-top:6px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.03em;
+  padding:6px 10px;border-radius:6px;border:1px solid var(--pine);background:var(--pineSoft);color:var(--pine);cursor:pointer;white-space:nowrap;}
+.runway{display:flex;gap:1.5px;align-items:flex-end;height:30px;}
+.runway button{flex:1;min-width:0;border:none;padding:0;cursor:pointer;border-radius:1px;transition:background .2s;}
+.runway-labels{display:flex;justify-content:space-between;margin-top:5px;margin-bottom:14px;font-family:var(--mono);font-size:9px;color:var(--soft);}
+.card{background:var(--card);border-radius:12px;padding:16px 16px 18px;border:1px solid var(--rule);}
+.tabs{display:flex;gap:6px;margin-top:12px;}
+.tabs button{flex:1;padding:10px 0;border-radius:8px;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--rule);background:var(--card);color:var(--soft);}
+.tabs button.active{border-color:var(--ink);background:var(--ink);color:#fff;}
+.nav-btn{background:none;border:none;font-family:var(--mono);font-size:11px;color:var(--soft);cursor:pointer;padding:0;}
+.nav-btn[disabled]{color:var(--rule);cursor:default;}
+.jump-btn{background:var(--pineSoft);border:none;font-family:var(--mono);font-size:10px;color:var(--pine);
+  cursor:pointer;padding:3px 9px;border-radius:5px;font-weight:700;}
+.block{width:100%;text-align:left;display:flex;gap:12px;padding:14px 4px;background:none;border:none;
+  border-top:1px solid var(--rule);cursor:pointer;align-items:flex-start;}
+.checkbox{width:20px;height:20px;flex-shrink:0;margin-top:2px;border-radius:5px;border:1.5px solid var(--rule);
+  display:flex;align-items:center;justify-content:center;transition:all .18s;background:transparent;}
+.checkbox.checked{background:var(--accent);border-color:var(--accent);}
+.block-body{flex:1;min-width:0;}
+.block-line{font-size:13.5px;line-height:1.45;margin-bottom:2px;color:var(--ink);}
+.block-line.done{text-decoration:line-through;color:var(--soft);}
+.field-label{font-family:var(--mono);font-size:9px;color:var(--soft);margin-bottom:3px;}
+.field-input{width:100%;padding:8px 9px;font-family:var(--mono);font-size:14px;border:1px solid var(--rule);
+  border-radius:7px;background:var(--paper);color:var(--ink);}
+.note-input{width:100%;margin-top:8px;padding:8px 9px;font-size:13px;font-family:var(--sans);border:1px solid var(--rule);
+  border-radius:7px;background:var(--paper);color:var(--ink);resize:vertical;}
+.mini-input{padding:5px 6px;font-family:var(--mono);font-size:11px;border:1px solid var(--rule);border-radius:5px;
+  background:var(--paper);color:var(--ink);}
+.group-header{width:100%;display:flex;align-items:center;gap:10px;padding:13px 2px;background:none;border:none;
+  cursor:pointer;text-align:left;}
+.overlay{position:fixed;inset:0;background:rgba(20,28,38,.45);display:flex;align-items:center;justify-content:center;
+  padding:16px;z-index:1000;}
+.modal{background:var(--card);border-radius:14px;padding:18px;max-width:480px;width:100%;max-height:85vh;overflow:auto;}
+.modal-tabs{display:flex;gap:6px;margin-bottom:12px;}
+.modal-tabs button{flex:1;padding:8px 0;border-radius:7px;cursor:pointer;font-family:var(--mono);font-size:10.5px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.04em;border:1px solid var(--rule);background:var(--paper);color:var(--soft);}
+.modal-tabs button.active{border-color:var(--ink);background:var(--ink);color:#fff;}
+.modal-help{font-size:12.5px;color:var(--soft);line-height:1.5;margin:0 0 10px;}
+.export-box{width:100%;height:140px;font-family:var(--mono);font-size:11px;padding:10px;border:1px solid var(--rule);
+  border-radius:8px;background:var(--paper);color:var(--ink);resize:vertical;}
+.modal-btn{flex:1;padding:10px 0;border-radius:8px;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:700;
+  border:1px solid var(--rule);background:var(--card);color:var(--ink);}
+.modal-btn.primary{background:var(--pine);border-color:var(--pine);color:#fff;}
+.feedback{margin-top:10px;font-size:12px;color:var(--pine);}
+.feedback.error{color:var(--rust);}
+.footer-note{font-size:10.5px;color:var(--soft);margin-top:14px;line-height:1.5;text-align:center;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const DATA = {"days":[{"dt":"2026-08-15","dow":"Sat","dm":"15 Aug","wk":1,"we":true,"ph":"First pass","am":"Watch: FSA LM1 - Introduction to Financial Statement Analysis \u2014 1.5h\nPractice: FSA LM1 - 70 Qs \u2014 2.3h","mid":"","pm":["Watch: FSA LM2 - Analyzing Income Statements \u2014 1.5h","Practice: FSA LM2 - 70 Qs (part) \u2014 1.0h"],"hrs":6.3,"q":70,"goal":"Finish FSA LM1","topic":"FSA"},{"dt":"2026-08-16","dow":"Sun","dm":"16 Aug","wk":1,"we":true,"ph":"First pass","am":"Practice: FSA LM2 - 70 Qs (continued) \u2014 1.3h\nWatch: FSA LM3 - Analyzing Balance Sheets \u2014 1.5h\nPractice: FSA LM3 - 70 Qs \u2014 2.3h","mid":"","pm":["Watch: FSA LM4 - Analyzing Statements of Cash Flows I (part) \u2014 1.2h"],"hrs":6.3,"q":140,"goal":"Finish FSA LM2-3","topic":"FSA"},{"dt":"2026-08-17","dow":"Mon","dm":"17 Aug","wk":1,"we":false,"ph":"First pass","am":"Cold recall: FSA LM2-4","mid":"","pm":["Watch: FSA LM4 - Analyzing Statements of Cash Flows I (continued) \u2014 0.3h","Practice: FSA LM4 - 70 Qs \u2014 2.3h"],"hrs":2.6,"q":70,"goal":"Finish FSA LM4","topic":"FSA"},{"dt":"2026-08-18","dow":"Tue","dm":"18 Aug","wk":1,"we":false,"ph":"First pass","am":"Cold recall: FSA LM4","mid":"FSA LM1-2 \u2014 3 days back","pm":["Watch: FSA LM5 - Analyzing Statements of Cash Flows II \u2014 1.5h","Practice: FSA LM5 - 70 Qs (part) \u2014 1.0h"],"hrs":2.5,"q":0,"goal":"Progress on FSA","topic":"FSA"},{"dt":"2026-08-19","dow":"Wed","dm":"19 Aug","wk":1,"we":false,"ph":"First pass","am":"Cold recall: FSA LM5","mid":"FSA LM2-4 \u2014 3 days back","pm":["Practice: FSA LM5 - 70 Qs (continued) \u2014 1.3h","Watch: FSA LM6 - Analysis of Inventories (part) \u2014 1.1h"],"hrs":2.5,"q":70,"goal":"Finish FSA LM5","topic":"FSA"},{"dt":"2026-08-20","dow":"Thu","dm":"20 Aug","wk":1,"we":false,"ph":"First pass","am":"Cold recall: FSA LM5-6","mid":"FSA LM4 \u2014 3 days back","pm":["Watch: FSA LM6 - Analysis of Inventories (continued) \u2014 0.3h","Practice: FSA LM6 - 70 Qs \u2014 2.3h"],"hrs":2.7,"q":70,"goal":"Finish FSA LM6","topic":"FSA"},{"dt":"2026-08-21","dow":"Fri","dm":"21 Aug","wk":1,"we":false,"ph":"First pass","am":"Cold recall: FSA LM6","mid":"FSA LM5 \u2014 3 days back","pm":["Watch: FSA LM7 - Analysis of Long-Term Assets \u2014 1.5h","Practice: FSA LM7 - 70 Qs (part) \u2014 1.0h"],"hrs":2.5,"q":0,"goal":"Progress on FSA","topic":"FSA"},{"dt":"2026-08-22","dow":"Sat","dm":"22 Aug","wk":1,"we":true,"ph":"First pass","am":"Practice: FSA LM7 - 70 Qs (continued) \u2014 1.3h\nWatch: FSA LM8 - Topics in Long-Term Liabilities and Equity \u2014 1.5h\nPractice: FSA LM8 - 70 Qs \u2014 2.3h","mid":"FSA LM5-6 \u2014 3 days back","pm":["Watch: FSA LM9 - Analysis of Income Taxes (part) \u2014 1.2h"],"hrs":6.3,"q":140,"goal":"Finish FSA LM7-8","topic":"FSA"},{"dt":"2026-08-23","dow":"Sun","dm":"23 Aug","wk":1,"we":true,"ph":"First pass","am":"Watch: FSA LM9 - Analysis of Income Taxes (continued) \u2014 0.3h\nPractice: FSA LM9 - 70 Qs \u2014 2.3h\nWatch: FSA LM10 - Financial Reporting Quality \u2014 1.5h","mid":"FSA LM6 \u2014 3 days back","pm":["Practice: FSA LM10 - 70 Qs \u2014 2.3h"],"hrs":6.5,"q":140,"goal":"Finish FSA LM9-10","topic":"FSA"},{"dt":"2026-08-24","dow":"Mon","dm":"24 Aug","wk":2,"we":false,"ph":"First pass","am":"Cold recall: FSA LM9-10","mid":"FSA LM7 \u2014 3 days back","pm":["Watch: FSA LM11 - Financial Analysis Techniques \u2014 1.5h","Practice: FSA LM11 - 70 Qs (part) \u2014 1.0h"],"hrs":2.5,"q":0,"goal":"Progress on FSA","topic":"FSA"},{"dt":"2026-08-25","dow":"Tue","dm":"25 Aug","wk":2,"we":false,"ph":"First pass","am":"Cold recall: FSA LM11","mid":"FSA LM7-9 \u2014 3 days back\nFSA LM1-2 \u2014 10 days back","pm":["Practice: FSA LM11 - 70 Qs (continued) \u2014 1.3h","Watch: FSA LM12 - Introduction to Financial Statement Modeling (part) \u2014 1.1h"],"hrs":2.5,"q":70,"goal":"Finish FSA LM11","topic":"FSA"},{"dt":"2026-08-26","dow":"Wed","dm":"26 Aug","wk":2,"we":false,"ph":"First pass","am":"Cold recall: FSA LM11-12","mid":"FSA LM9-10 \u2014 3 days back\nFSA LM2-4 \u2014 10 days back","pm":["Watch: FSA LM12 - Introduction to Financial Statement Modeling (continued) \u2014 0.3h","Practice: FSA LM12 - 70 Qs \u2014 2.3h"],"hrs":2.7,"q":70,"goal":"Finish FSA LM12","topic":"FSA"},{"dt":"2026-08-27","dow":"Thu","dm":"27 Aug","wk":2,"we":false,"ph":"First pass","am":"Cold recall: FSA LM12","mid":"FSA LM11 \u2014 3 days back\nFSA LM4 \u2014 10 days back","pm":["Watch: Quant LM1 - Rates and Returns \u2014 1.2h","Practice: Quant LM1 - 50 Qs (part) \u2014 1.3h"],"hrs":2.5,"q":0,"goal":"Progress on Quant","topic":"Quant"},{"dt":"2026-08-28","dow":"Fri","dm":"28 Aug","wk":2,"we":false,"ph":"First pass","am":"Cold recall: Quant LM1","mid":"FSA LM11-12 \u2014 3 days back\nFSA LM5 \u2014 10 days back","pm":["Practice: Quant LM1 - 50 Qs (continued) \u2014 0.4h","Watch: Quant LM2 - Time Value of Money in Finance \u2014 1.2h","Practice: Quant LM2 - 50 Qs (part) \u2014 0.9h"],"hrs":2.5,"q":50,"goal":"Finish Quant LM1","topic":"Quant"},{"dt":"2026-08-29","dow":"Sat","dm":"29 Aug","wk":2,"we":true,"ph":"First pass","am":"Practice: Quant LM2 - 50 Qs (continued) \u2014 0.8h\nWatch: Quant LM3 - Statistical Measures of Asset Returns \u2014 1.2h\nPractice: Quant LM3 - 50 Qs \u2014 1.7h","mid":"FSA LM12 \u2014 3 days back\nFSA LM5-6 \u2014 10 days back","pm":["Watch: Quant LM4 - Probability Trees and Conditional Expectations \u2014 1.2h","Practice: Quant LM4 - 50 Qs (part) \u2014 1.4h"],"hrs":6.3,"q":100,"goal":"Finish Quant LM2-3","topic":"Quant"},{"dt":"2026-08-30","dow":"Sun","dm":"30 Aug","wk":2,"we":true,"ph":"First pass","am":"Practice: Quant LM4 - 50 Qs (continued) \u2014 0.3h\nWatch: Quant LM5 - Portfolio Mathematics \u2014 1.2h\nPractice: Quant LM5 - 50 Qs \u2014 1.7h\nWatch: Quant LM6 - Simulation Methods \u2014 1.2h","mid":"Quant LM1 \u2014 3 days back\nFSA LM6 \u2014 10 days back","pm":["Practice: Quant LM6 - 50 Qs \u2014 1.7h"],"hrs":6.0,"q":150,"goal":"Finish Quant LM4-6","topic":"Quant"},{"dt":"2026-08-31","dow":"Mon","dm":"31 Aug","wk":3,"we":false,"ph":"First pass","am":"Cold recall: Quant LM4-6","mid":"Quant LM1-2 \u2014 3 days back\nFSA LM7 \u2014 10 days back","pm":["Watch: Quant LM7 - Estimation and Inference \u2014 1.2h","Practice: Quant LM7 - 50 Qs (part) \u2014 1.3h"],"hrs":2.5,"q":0,"goal":"Progress on Quant","topic":"Quant"},{"dt":"2026-09-01","dow":"Tue","dm":"1 Sep","wk":3,"we":false,"ph":"First pass","am":"Cold recall: Quant LM7","mid":"Quant LM2-4 \u2014 3 days back\nFSA LM7-9 \u2014 10 days back","pm":["Practice: Quant LM7 - 50 Qs (continued) \u2014 0.4h","Watch: Quant LM8 - Hypothesis Testing \u2014 1.2h","Practice: Quant LM8 - 50 Qs (part) \u2014 0.9h"],"hrs":2.5,"q":50,"goal":"Finish Quant LM7","topic":"Quant"},{"dt":"2026-09-02","dow":"Wed","dm":"2 Sep","wk":3,"we":false,"ph":"First pass","am":"Cold recall: Quant LM7-8","mid":"Quant LM4-6 \u2014 3 days back\nFSA LM9-10 \u2014 10 days back","pm":["Practice: Quant LM8 - 50 Qs (continued) \u2014 0.8h","Watch: Quant LM9 - Parametric and Non-Parametric Tests of Independence \u2014 1.2h"],"hrs":2.0,"q":50,"goal":"Finish Quant LM8","topic":"Quant"},{"dt":"2026-09-03","dow":"Thu","dm":"3 Sep","wk":3,"we":false,"ph":"First pass","am":"Cold recall: Quant LM8-9","mid":"Quant LM7 \u2014 3 days back\nFSA LM11 \u2014 10 days back","pm":["Practice: Quant LM9 - 50 Qs \u2014 1.7h","Watch: Quant LM10 - Simple Linear Regression (part) \u2014 0.8h"],"hrs":2.5,"q":50,"goal":"Finish Quant LM9","topic":"Quant"},{"dt":"2026-09-04","dow":"Fri","dm":"4 Sep","wk":3,"we":false,"ph":"First pass","am":"Cold recall: Quant LM9-10","mid":"Quant LM7-8 \u2014 3 days back\nFSA LM11-12 \u2014 10 days back","pm":["Watch: Quant LM10 - Simple Linear Regression (continued) \u2014 0.4h","Practice: Quant LM10 - 50 Qs \u2014 1.7h"],"hrs":2.1,"q":50,"goal":"Finish Quant LM10","topic":"Quant"},{"dt":"2026-09-05","dow":"Sat","dm":"5 Sep","wk":3,"we":true,"ph":"First pass","am":"Watch: Quant LM11 - Introduction to Big Data Techniques \u2014 1.2h\nPractice: Quant LM11 - 50 Qs \u2014 1.7h\nWatch: Fixed Income LM1 - Fixed-Income Instrument Features \u2014 0.5h\nPractice: Fixed Income LM1 - 40 Qs \u2014 1.3h","mid":"Quant LM8-9 \u2014 3 days back\nFSA LM12 \u2014 10 days back","pm":["Watch: Fixed Income LM2 - Fixed-Income Cash Flows and Types \u2014 0.5h","Practice: Fixed Income LM2 - 40 Qs \u2014 1.3h"],"hrs":6.5,"q":130,"goal":"Finish Quant LM11; Fixed Income LM1-2","topic":"Quant / Fixed Income"},{"dt":"2026-09-06","dow":"Sun","dm":"6 Sep","wk":3,"we":true,"ph":"First pass","am":"Watch: Fixed Income LM3 - Fixed-Income Issuance and Trading \u2014 0.5h\nPractice: Fixed Income LM3 - 40 Qs \u2014 1.3h\nWatch: Fixed Income LM4 - Fixed-Income Markets for Corporate Issuers \u2014 0.5h\nPractice: Fixed Income LM4 - 40 Qs \u2014 1.3h","mid":"Quant LM9-10 \u2014 3 days back\nQuant LM1 \u2014 10 days back","pm":["Watch: Fixed Income LM5 - Fixed-Income Markets for Government Issuers \u2014 0.5h","Practice: Fixed Income LM5 - 40 Qs \u2014 1.3h","Watch: Fixed Income LM6 - Fixed-Income Bond Valuation: Prices and Yields \u2014 0.5h"],"hrs":5.8,"q":120,"goal":"Finish Fixed Income LM3-5","topic":"Fixed Income"},{"dt":"2026-09-07","dow":"Mon","dm":"7 Sep","wk":4,"we":false,"ph":"First pass","am":"Cold recall: Fixed Income LM3-6","mid":"Quant LM10 \u2014 3 days back\nQuant LM1-2 \u2014 10 days back","pm":["Practice: Fixed Income LM6 - 40 Qs \u2014 1.3h","Watch: Fixed Income LM7 - Yield and Yield Spread Measures for Fixed-Rate Bonds \u2014 0.5h","Practice: Fixed Income LM7 - 40 Qs (part) \u2014 0.7h"],"hrs":2.5,"q":40,"goal":"Finish Fixed Income LM6","topic":"Fixed Income"},{"dt":"2026-09-08","dow":"Tue","dm":"8 Sep","wk":4,"we":false,"ph":"First pass","am":"Cold recall: Fixed Income LM6-7","mid":"Quant LM11; Fixed Income LM1-2 \u2014 3 days back\nQuant LM2-4 \u2014 10 days back","pm":["Practice: Fixed Income LM7 - 40 Qs (continued) \u2014 0.6h","Watch: Fixed Income LM8 - Yield and Yield Spread Measures for Floating-Rate Instruments \u2014 0.5h","Practice: Fixed Income LM8 - 40 Qs \u2014 1.3h"],"hrs":2.4,"q":80,"goal":"Finish Fixed Income LM7-8","topic":"Fixed Income"},{"dt":"2026-09-09","dow":"Wed","dm":"9 Sep","wk":4,"we":false,"ph":"First pass","am":"Cold recall: Fixed Income LM7-8","mid":"Fixed Income LM3-6 \u2014 3 days back\nQuant LM4-6 \u2014 10 days back","pm":["Watch: Fixed Income LM9 - Term Structure: Spot, Par, and Forward Curves \u2014 0.5h","Practice: Fixed Income LM9 - 40 Qs \u2014 1.3h","Watch: Fixed Income LM10 - Interest Rate Risk and Return \u2014 0.5h"],"hrs":2.2,"q":40,"goal":"Finish Fixed Income LM9","topic":"Fixed Income"},{"dt":"2026-09-10","dow":"Thu","dm":"10 Sep","wk":4,"we":false,"ph":"First pass","am":"Cold recall: Fixed Income LM9-10","mid":"Fixed Income LM6-7 \u2014 3 days back\nQuant LM7 \u2014 10 days back","pm":["Practice: Fixed Income LM10 - 40 Qs \u2014 1.3h","Watch: Fixed Income LM11 - Yield-Based Bond Duration Measures and Properties \u2014 0.5h","Practice: Fixed Income LM11 - 40 Qs (part) \u2014 0.7h"],"hrs":2.5,"q":40,"goal":"Finish Fixed Income LM10","topic":"Fixed Income"},{"dt":"2026-09-11","dow":"Fri","dm":"11 Sep","wk":4,"we":false,"ph":"First pass","am":"Cold recall: Fixed Income LM10-11","mid":"Fixed Income LM7-8 \u2014 3 days back\nQuant LM7-8 \u2014 10 days back","pm":["Practice: Fixed Income LM11 - 40 Qs (continued) \u2014 0.6h","Watch: Fixed Income LM12 - Yield-Based Bond Convexity and Portfolio Properties \u2014 0.5h","Practice: Fixed Income LM12 - 40 Qs \u2014 1.3h"],"hrs":2.4,"q":80,"goal":"Finish Fixed Income LM11-12","topic":"Fixed Income"},{"dt":"2026-09-12","dow":"Sat","dm":"12 Sep","wk":4,"we":true,"ph":"First pass","am":"Watch: Fixed Income LM13 - Curve-Based and Empirical Fixed-Income Risk Measures \u2014 0.5h\nPractice: Fixed Income LM13 - 40 Qs \u2014 1.3h\nWatch: Fixed Income LM14 - Credit Risk \u2014 0.5h\nPractice: Fixed Income LM14 - 40 Qs \u2014 1.3h","mid":"Fixed Income LM9-10 \u2014 3 days back\nQuant LM8-9 \u2014 10 days back","pm":["Watch: Fixed Income LM15 - Credit Analysis for Government Issuers \u2014 0.5h","Practice: Fixed Income LM15 - 40 Qs \u2014 1.3h","Watch: Fixed Income LM16 - Credit Analysis for Corporate Issuers \u2014 0.5h"],"hrs":5.8,"q":120,"goal":"Finish Fixed Income LM13-15","topic":"Fixed Income"},{"dt":"2026-09-13","dow":"Sun","dm":"13 Sep","wk":4,"we":true,"ph":"First pass","am":"Practice: Fixed Income LM16 - 40 Qs \u2014 1.3h\nWatch: Fixed Income LM17 - Fixed-Income Securitization \u2014 0.5h\nPractice: Fixed Income LM17 - 40 Qs \u2014 1.3h\nWatch: Fixed Income LM18 - Asset-Backed Security (ABS) Instrument and Market Features \u2014 0.5h","mid":"Fixed Income LM10-11 \u2014 3 days back\nQuant LM9-10 \u2014 10 days back","pm":["Practice: Fixed Income LM18 - 40 Qs \u2014 1.3h","Watch: Fixed Income LM19 - Mortgage-Backed Security (MBS) Instrument and Market Features \u2014 0.5h","Practice: Fixed Income LM19 - 40 Qs (part) \u2014 0.9h"],"hrs":6.3,"q":120,"goal":"Finish Fixed Income LM16-18","topic":"Fixed Income"},{"dt":"2026-09-14","dow":"Mon","dm":"14 Sep","wk":5,"we":false,"ph":"First pass","am":"Cold recall: Fixed Income LM16-19","mid":"Fixed Income LM11-12 \u2014 3 days back\nQuant LM10 \u2014 10 days back","pm":["Practice: Fixed Income LM19 - 40 Qs (continued) \u2014 0.4h","Watch: Derivatives LM1 - Derivative Instrument and Derivative Market Features \u2014 0.7h","Practice: Derivatives LM1 - 45 Qs \u2014 1.5h"],"hrs":2.6,"q":85,"goal":"Finish Fixed Income LM19; Derivatives LM1","topic":"Fixed Income / Derivatives"},{"dt":"2026-09-15","dow":"Tue","dm":"15 Sep","wk":5,"we":false,"ph":"First pass","am":"Cold recall: Fixed Income LM19; Derivatives LM1","mid":"Fixed Income LM13-16 \u2014 3 days back\nQuant LM11; Fixed Income LM1-2 \u2014 10 days back","pm":["Watch: Derivatives LM2 - Forward Commitment and Contingent Claim Features \u2014 0.7h","Practice: Derivatives LM2 - 45 Qs \u2014 1.5h"],"hrs":2.2,"q":45,"goal":"Finish Derivatives LM2","topic":"Derivatives"},{"dt":"2026-09-16","dow":"Wed","dm":"16 Sep","wk":5,"we":false,"ph":"First pass","am":"Cold recall: Derivatives LM2","mid":"Fixed Income LM16-19 \u2014 3 days back\nFixed Income LM3-6 \u2014 10 days back","pm":["Watch: Derivatives LM3 - Derivative Benefits, Risks, and Issuer/Investor Uses \u2014 0.7h","Practice: Derivatives LM3 - 45 Qs \u2014 1.5h"],"hrs":2.2,"q":45,"goal":"Finish Derivatives LM3","topic":"Derivatives"},{"dt":"2026-09-17","dow":"Thu","dm":"17 Sep","wk":5,"we":false,"ph":"First pass","am":"Cold recall: Derivatives LM3","mid":"Fixed Income LM19; Derivatives LM1 \u2014 3 days back\nFixed Income LM6-7 \u2014 10 days back","pm":["Watch: Derivatives LM4 - Arbitrage, Replication, and the Cost of Carry \u2014 0.7h","Practice: Derivatives LM4 - 45 Qs \u2014 1.5h"],"hrs":2.2,"q":45,"goal":"Finish Derivatives LM4","topic":"Derivatives"},{"dt":"2026-09-18","dow":"Fri","dm":"18 Sep","wk":5,"we":false,"ph":"First pass","am":"Cold recall: Derivatives LM4","mid":"Derivatives LM2 \u2014 3 days back\nFixed Income LM7-8 \u2014 10 days back","pm":["Watch: Derivatives LM5 - Pricing and Valuation of Forward Contracts \u2014 0.7h","Practice: Derivatives LM5 - 45 Qs \u2014 1.5h"],"hrs":2.2,"q":45,"goal":"Finish Derivatives LM5","topic":"Derivatives"},{"dt":"2026-09-19","dow":"Sat","dm":"19 Sep","wk":5,"we":true,"ph":"First pass","am":"Watch: Derivatives LM6 - Pricing and Valuation of Futures Contracts \u2014 0.7h\nPractice: Derivatives LM6 - 45 Qs \u2014 1.5h\nWatch: Derivatives LM7 - Pricing and Valuation of Interest Rate and Other Swaps \u2014 0.7h\nPractice: Derivatives LM7 - 45 Qs \u2014 1.5h","mid":"Derivatives LM3 \u2014 3 days back\nFixed Income LM9-10 \u2014 10 days back","pm":["Watch: Derivatives LM8 - Pricing and Valuation of Options \u2014 0.7h","Practice: Derivatives LM8 - 45 Qs (part) \u2014 1.1h"],"hrs":6.3,"q":90,"goal":"Finish Derivatives LM6-7","topic":"Derivatives"},{"dt":"2026-09-20","dow":"Sun","dm":"20 Sep","wk":5,"we":true,"ph":"First pass","am":"Practice: Derivatives LM8 - 45 Qs (continued) \u2014 0.4h\nWatch: Derivatives LM9 - Option Replication Using Put-Call Parity \u2014 0.7h\nPractice: Derivatives LM9 - 45 Qs \u2014 1.5h\nWatch: Derivatives LM10 - Valuing a Derivative Using a One-Period Binomial Model \u2014 0.7h\nPractice: Derivatives LM10 - 45 Qs \u2014 1.5h","mid":"Derivatives LM4 \u2014 3 days back\nFixed Income LM10-11 \u2014 10 days back","pm":["Watch: Equity LM1 - Market Organization and Structure \u2014 1.3h"],"hrs":6.2,"q":135,"goal":"Finish Derivatives LM8-10","topic":"Derivatives / Equity"},{"dt":"2026-09-21","dow":"Mon","dm":"21 Sep","wk":6,"we":false,"ph":"First pass","am":"Cold recall: Derivatives LM8-10; Equity LM1","mid":"Derivatives LM5 \u2014 3 days back\nFixed Income LM11-12 \u2014 10 days back","pm":["Practice: Equity LM1 - 70 Qs \u2014 2.3h"],"hrs":2.3,"q":70,"goal":"Finish Equity LM1","topic":"Equity"},{"dt":"2026-09-22","dow":"Tue","dm":"22 Sep","wk":6,"we":false,"ph":"First pass","am":"Cold recall: Equity LM1","mid":"Derivatives LM6-8 \u2014 3 days back\nFixed Income LM13-16 \u2014 10 days back","pm":["Watch: Equity LM2 - Security Market Indexes \u2014 1.3h","Practice: Equity LM2 - 70 Qs (part) \u2014 1.1h"],"hrs":2.5,"q":0,"goal":"Progress on Equity","topic":"Equity"},{"dt":"2026-09-23","dow":"Wed","dm":"23 Sep","wk":6,"we":false,"ph":"First pass","am":"Cold recall: Equity LM2","mid":"Derivatives LM8-10; Equity LM1 \u2014 3 days back\nFixed Income LM16-19 \u2014 10 days back","pm":["Practice: Equity LM2 - 70 Qs (continued) \u2014 1.2h","Watch: Equity LM3 - Market Efficiency \u2014 1.3h"],"hrs":2.5,"q":70,"goal":"Finish Equity LM2","topic":"Equity"},{"dt":"2026-09-24","dow":"Thu","dm":"24 Sep","wk":6,"we":false,"ph":"First pass","am":"Cold recall: Equity LM2-3","mid":"Equity LM1 \u2014 3 days back\nFixed Income LM19; Derivatives LM1 \u2014 10 days back","pm":["Practice: Equity LM3 - 70 Qs \u2014 2.3h"],"hrs":2.3,"q":70,"goal":"Finish Equity LM3","topic":"Equity"},{"dt":"2026-09-25","dow":"Fri","dm":"25 Sep","wk":6,"we":false,"ph":"First pass","am":"Cold recall: Equity LM3","mid":"Equity LM2 \u2014 3 days back\nDerivatives LM2 \u2014 10 days back","pm":["Watch: Equity LM4 - Overview of Equity Securities \u2014 1.3h","Practice: Equity LM4 - 70 Qs (part) \u2014 1.1h"],"hrs":2.5,"q":0,"goal":"Progress on Equity","topic":"Equity"},{"dt":"2026-09-26","dow":"Sat","dm":"26 Sep","wk":6,"we":true,"ph":"First pass","am":"Practice: Equity LM4 - 70 Qs (continued) \u2014 1.2h\nWatch: Equity LM5 - Company Analysis: Past and Present \u2014 1.3h\nPractice: Equity LM5 - 70 Qs \u2014 2.3h","mid":"Equity LM2-3 \u2014 3 days back\nDerivatives LM3 \u2014 10 days back","pm":["Watch: Equity LM6 - Industry and Competitive Analysis \u2014 1.3h"],"hrs":6.2,"q":140,"goal":"Finish Equity LM4-5","topic":"Equity"},{"dt":"2026-09-27","dow":"Sun","dm":"27 Sep","wk":6,"we":true,"ph":"First pass","am":"Practice: Equity LM6 - 70 Qs \u2014 2.3h\nWatch: Equity LM7 - Company Analysis: Forecasting \u2014 1.3h","mid":"Equity LM3 \u2014 3 days back\nDerivatives LM4 \u2014 10 days back","pm":["Practice: Equity LM7 - 70 Qs \u2014 2.3h"],"hrs":6.0,"q":140,"goal":"Finish Equity LM6-7","topic":"Equity"},{"dt":"2026-09-28","dow":"Mon","dm":"28 Sep","wk":7,"we":false,"ph":"First pass","am":"Cold recall: Equity LM6-7","mid":"Equity LM4 \u2014 3 days back\nDerivatives LM5 \u2014 10 days back","pm":["Watch: Equity LM8 - Equity Valuation: Concepts and Basic Tools \u2014 1.3h","Practice: Equity LM8 - 70 Qs (part) \u2014 1.1h"],"hrs":2.5,"q":0,"goal":"Progress on Equity","topic":"Equity"},{"dt":"2026-09-29","dow":"Tue","dm":"29 Sep","wk":7,"we":false,"ph":"First pass","am":"Cold recall: Equity LM8","mid":"Equity LM4-6 \u2014 3 days back\nDerivatives LM6-8 \u2014 10 days back","pm":["Practice: Equity LM8 - 70 Qs (continued) \u2014 1.2h","Watch: Corporate Issuers LM1 - Organizational Forms, Issuer Features, and Ownership \u2014 0.8h"],"hrs":2.0,"q":70,"goal":"Finish Equity LM8","topic":"Equity / Corporate Issuers"},{"dt":"2026-09-30","dow":"Wed","dm":"30 Sep","wk":7,"we":false,"ph":"First pass","am":"Cold recall: Equity LM8; Corporate Issuers LM1","mid":"Equity LM6-7 \u2014 3 days back\nDerivatives LM8-10; Equity LM1 \u2014 10 days back","pm":["Practice: Corporate Issuers LM1 - 50 Qs \u2014 1.7h","Watch: Corporate Issuers LM2 - Investors and Other Stakeholders \u2014 0.8h"],"hrs":2.5,"q":50,"goal":"Finish Corporate Issuers LM1","topic":"Corporate Issuers"},{"dt":"2026-10-01","dow":"Thu","dm":"1 Oct","wk":7,"we":false,"ph":"First pass","am":"Cold recall: Corporate Issuers LM1-2","mid":"Equity LM8 \u2014 3 days back\nEquity LM1 \u2014 10 days back","pm":["Practice: Corporate Issuers LM2 - 50 Qs \u2014 1.7h","Watch: Corporate Issuers LM3 - Corporate Governance: Conflicts, Mechanisms, Risks, Benefits \u2014 0.8h"],"hrs":2.5,"q":50,"goal":"Finish Corporate Issuers LM2","topic":"Corporate Issuers"},{"dt":"2026-10-02","dow":"Fri","dm":"2 Oct","wk":7,"we":false,"ph":"First pass","am":"Cold recall: Corporate Issuers LM2-3","mid":"Equity LM8; Corporate Issuers LM1 \u2014 3 days back\nEquity LM2 \u2014 10 days back","pm":["Practice: Corporate Issuers LM3 - 50 Qs \u2014 1.7h","Watch: Corporate Issuers LM4 - Working Capital and Liquidity \u2014 0.8h"],"hrs":2.5,"q":50,"goal":"Finish Corporate Issuers LM3","topic":"Corporate Issuers"},{"dt":"2026-10-03","dow":"Sat","dm":"3 Oct","wk":7,"we":true,"ph":"First pass","am":"Practice: Corporate Issuers LM4 - 50 Qs \u2014 1.7h\nWatch: Corporate Issuers LM5 - Capital Investments and Capital Allocation \u2014 0.8h\nPractice: Corporate Issuers LM5 - 50 Qs \u2014 1.7h","mid":"Corporate Issuers LM1-2 \u2014 3 days back\nEquity LM2-3 \u2014 10 days back","pm":["Watch: Corporate Issuers LM6 - Capital Structure \u2014 0.8h","Practice: Corporate Issuers LM6 - 50 Qs (part) \u2014 1.4h"],"hrs":6.3,"q":100,"goal":"Finish Corporate Issuers LM4-5","topic":"Corporate Issuers"},{"dt":"2026-10-04","dow":"Sun","dm":"4 Oct","wk":7,"we":true,"ph":"First pass","am":"Practice: Corporate Issuers LM6 - 50 Qs (continued) \u2014 0.3h\nWatch: Corporate Issuers LM7 - Business Models \u2014 0.8h\nPractice: Corporate Issuers LM7 - 50 Qs \u2014 1.7h\nWatch: Portfolio Management LM1 - Portfolio Risk and Return: Part I \u2014 1.5h","mid":"Corporate Issuers LM2-3 \u2014 3 days back\nEquity LM3 \u2014 10 days back","pm":["Practice: Portfolio Management LM1 - 55 Qs \u2014 1.8h"],"hrs":6.1,"q":155,"goal":"Finish Corporate Issuers LM6-7; Portfolio Management LM1","topic":"Corporate Issuers / Portfolio Management"},{"dt":"2026-10-05","dow":"Mon","dm":"5 Oct","wk":8,"we":false,"ph":"First pass","am":"Cold recall: Corporate Issuers LM6-7; Portfolio Management LM1","mid":"Corporate Issuers LM3-4 \u2014 3 days back\nEquity LM4 \u2014 10 days back","pm":["Watch: Portfolio Management LM2 - Portfolio Risk and Return: Part II \u2014 1.5h","Practice: Portfolio Management LM2 - 55 Qs (part) \u2014 0.9h"],"hrs":2.5,"q":0,"goal":"Progress on Portfolio Management","topic":"Portfolio Management"},{"dt":"2026-10-06","dow":"Tue","dm":"6 Oct","wk":8,"we":false,"ph":"First pass","am":"Cold recall: Portfolio Management LM2","mid":"Corporate Issuers LM4-6 \u2014 3 days back\nEquity LM4-6 \u2014 10 days back","pm":["Practice: Portfolio Management LM2 - 55 Qs (continued) \u2014 0.9h","Watch: Portfolio Management LM3 - Portfolio Management: An Overview \u2014 1.5h"],"hrs":2.4,"q":55,"goal":"Finish Portfolio Management LM2","topic":"Portfolio Management"},{"dt":"2026-10-07","dow":"Wed","dm":"7 Oct","wk":8,"we":false,"ph":"First pass","am":"Cold recall: Portfolio Management LM2-3","mid":"Corporate Issuers LM6-7; Portfolio Management LM1 \u2014 3 days back\nEquity LM6-7 \u2014 10 days back","pm":["Practice: Portfolio Management LM3 - 55 Qs \u2014 1.8h","Watch: Portfolio Management LM4 - Basics of Portfolio Planning and Construction (part) \u2014 0.6h"],"hrs":2.5,"q":55,"goal":"Finish Portfolio Management LM3","topic":"Portfolio Management"},{"dt":"2026-10-08","dow":"Thu","dm":"8 Oct","wk":8,"we":false,"ph":"First pass","am":"Cold recall: Portfolio Management LM3-4","mid":"Portfolio Management LM2 \u2014 3 days back\nEquity LM8 \u2014 10 days back","pm":["Watch: Portfolio Management LM4 - Basics of Portfolio Planning and Construction (continued) \u2014 0.9h","Practice: Portfolio Management LM4 - 55 Qs (part) \u2014 1.6h"],"hrs":2.5,"q":0,"goal":"Progress on Portfolio Management","topic":"Portfolio Management"},{"dt":"2026-10-09","dow":"Fri","dm":"9 Oct","wk":8,"we":false,"ph":"First pass","am":"Cold recall: Portfolio Management LM4","mid":"Portfolio Management LM2-3 \u2014 3 days back\nEquity LM8; Corporate Issuers LM1 \u2014 10 days back","pm":["Practice: Portfolio Management LM4 - 55 Qs (continued) \u2014 0.3h","Watch: Portfolio Management LM5 - The Behavioral Biases of Individuals \u2014 1.5h","Practice: Portfolio Management LM5 - 55 Qs (part) \u2014 0.7h"],"hrs":2.5,"q":55,"goal":"Finish Portfolio Management LM4","topic":"Portfolio Management"},{"dt":"2026-10-10","dow":"Sat","dm":"10 Oct","wk":8,"we":true,"ph":"First pass","am":"Practice: Portfolio Management LM5 - 55 Qs (continued) \u2014 1.1h\nWatch: Portfolio Management LM6 - Introduction to Risk Management \u2014 1.5h\nPractice: Portfolio Management LM6 - 55 Qs \u2014 1.8h","mid":"Portfolio Management LM3-4 \u2014 3 days back\nCorporate Issuers LM1-2 \u2014 10 days back","pm":["Watch: Economics LM1 - The Firm and Market Structures \u2014 1.5h"],"hrs":6.0,"q":110,"goal":"Finish Portfolio Management LM5-6","topic":"Portfolio Management / Economics"},{"dt":"2026-10-11","dow":"Sun","dm":"11 Oct","wk":8,"we":true,"ph":"First pass","am":"Practice: Economics LM1 - 50 Qs \u2014 1.7h\nWatch: Economics LM2 - Understanding Business Cycles \u2014 1.5h\nPractice: Economics LM2 - 50 Qs \u2014 1.7h","mid":"Portfolio Management LM4 \u2014 3 days back\nCorporate Issuers LM2-3 \u2014 10 days back","pm":["Watch: Economics LM3 - Fiscal Policy \u2014 1.5h"],"hrs":6.4,"q":100,"goal":"Finish Economics LM1-2","topic":"Economics"},{"dt":"2026-10-12","dow":"Mon","dm":"12 Oct","wk":9,"we":false,"ph":"First pass","am":"Cold recall: Economics LM1-3","mid":"Portfolio Management LM4-5 \u2014 3 days back\nCorporate Issuers LM3-4 \u2014 10 days back","pm":["Practice: Economics LM3 - 50 Qs \u2014 1.7h","Watch: Economics LM4 - Monetary Policy (part) \u2014 0.8h"],"hrs":2.5,"q":50,"goal":"Finish Economics LM3","topic":"Economics"},{"dt":"2026-10-13","dow":"Tue","dm":"13 Oct","wk":9,"we":false,"ph":"First pass","am":"Cold recall: Economics LM3-4","mid":"Portfolio Management LM5-6; Economics LM1 \u2014 3 days back\nCorporate Issuers LM4-6 \u2014 10 days back","pm":["Watch: Economics LM4 - Monetary Policy (continued) \u2014 0.7h","Practice: Economics LM4 - 50 Qs \u2014 1.7h"],"hrs":2.4,"q":50,"goal":"Finish Economics LM4","topic":"Economics"},{"dt":"2026-10-14","dow":"Wed","dm":"14 Oct","wk":9,"we":false,"ph":"First pass","am":"Cold recall: Economics LM4","mid":"Economics LM1-3 \u2014 3 days back\nCorporate Issuers LM6-7; Portfolio Management LM1 \u2014 10 days back","pm":["Watch: Economics LM5 - Introduction to Geopolitics \u2014 1.5h","Practice: Economics LM5 - 50 Qs (part) \u2014 1.0h"],"hrs":2.5,"q":0,"goal":"Progress on Economics","topic":"Economics"},{"dt":"2026-10-15","dow":"Thu","dm":"15 Oct","wk":9,"we":false,"ph":"First pass","am":"Cold recall: Economics LM5","mid":"Economics LM3-4 \u2014 3 days back\nPortfolio Management LM2 \u2014 10 days back","pm":["Practice: Economics LM5 - 50 Qs (continued) \u2014 0.7h","Watch: Economics LM6 - International Trade \u2014 1.5h"],"hrs":2.2,"q":50,"goal":"Finish Economics LM5","topic":"Economics"},{"dt":"2026-10-16","dow":"Fri","dm":"16 Oct","wk":9,"we":false,"ph":"First pass","am":"Cold recall: Economics LM5-6","mid":"Economics LM4 \u2014 3 days back\nPortfolio Management LM2-3 \u2014 10 days back","pm":["Practice: Economics LM6 - 50 Qs \u2014 1.7h","Watch: Economics LM7 - Capital Flows and the FX Market (part) \u2014 0.8h"],"hrs":2.5,"q":50,"goal":"Finish Economics LM6","topic":"Economics"},{"dt":"2026-10-17","dow":"Sat","dm":"17 Oct","wk":9,"we":true,"ph":"First pass","am":"Watch: Economics LM7 - Capital Flows and the FX Market (continued) \u2014 0.7h\nPractice: Economics LM7 - 50 Qs \u2014 1.7h\nWatch: Economics LM8 - Exchange Rate Calculations \u2014 1.5h","mid":"Economics LM5 \u2014 3 days back\nPortfolio Management LM3-4 \u2014 10 days back","pm":["Practice: Economics LM8 - 50 Qs \u2014 1.7h","Watch: Alternative Investments LM1 - Alternative Investment Features, Methods, and Structures \u2014 0.4h"],"hrs":5.9,"q":100,"goal":"Finish Economics LM7-8","topic":"Economics / Alternative Investments"},{"dt":"2026-10-18","dow":"Sun","dm":"18 Oct","wk":9,"we":true,"ph":"First pass","am":"Practice: Alternative Investments LM1 - 30 Qs \u2014 1.0h\nWatch: Alternative Investments LM2 - Alternative Investment Performance and Returns \u2014 0.4h\nPractice: Alternative Investments LM2 - 30 Qs \u2014 1.0h\nWatch: Alternative Investments LM3 - Investments in Private Capital: Equity and Debt \u2014 0.4h\nPractice: Alternative Investments LM3 - 30 Qs \u2014 1.0h","mid":"Economics LM5-6 \u2014 3 days back\nPortfolio Management LM4 \u2014 10 days back","pm":["Watch: Alternative Investments LM4 - Real Estate and Infrastructure \u2014 0.4h","Practice: Alternative Investments LM4 - 30 Qs \u2014 1.0h","Watch: Alternative Investments LM5 - Natural Resources \u2014 0.4h","Practice: Alternative Investments LM5 - 30 Qs \u2014 1.0h"],"hrs":6.4,"q":150,"goal":"Finish Alternative Investments LM1-5","topic":"Alternative Investments"},{"dt":"2026-10-19","dow":"Mon","dm":"19 Oct","wk":10,"we":false,"ph":"First pass","am":"Cold recall: Alternative Investments LM1-5","mid":"Economics LM6-7 \u2014 3 days back\nPortfolio Management LM4-5 \u2014 10 days back","pm":["Watch: Alternative Investments LM6 - Hedge Funds \u2014 0.4h","Practice: Alternative Investments LM6 - 30 Qs \u2014 1.0h","Watch: Alternative Investments LM7 - Introduction to Digital Assets \u2014 0.4h","Practice: Alternative Investments LM7 - 30 Qs (part) \u2014 0.8h"],"hrs":2.5,"q":30,"goal":"Finish Alternative Investments LM6","topic":"Alternative Investments"},{"dt":"2026-10-20","dow":"Tue","dm":"20 Oct","wk":10,"we":false,"ph":"First pass","am":"Cold recall: Alternative Investments LM6-7","mid":"Economics LM7-8; Alternative Investments LM1 \u2014 3 days back\nPortfolio Management LM5-6; Economics LM1 \u2014 10 days back","pm":["Practice: Alternative Investments LM7 - 30 Qs (continued) \u2014 0.2h","Watch: Ethics LM1 - Ethics and Trust in the Investment Profession \u2014 1.5h","Practice: Ethics LM1 - 80 Qs (part) \u2014 0.7h"],"hrs":2.5,"q":30,"goal":"Finish Alternative Investments LM7","topic":"Alternative Investments / Ethics"},{"dt":"2026-10-21","dow":"Wed","dm":"21 Oct","wk":10,"we":false,"ph":"First pass","am":"Cold recall: Alternative Investments LM7; Ethics LM1","mid":"Alternative Investments LM1-5 \u2014 3 days back\nEconomics LM1-3 \u2014 10 days back","pm":["Practice: Ethics LM1 - 80 Qs (continued) \u2014 2.0h"],"hrs":2.0,"q":80,"goal":"Finish Ethics LM1","topic":"Ethics"},{"dt":"2026-10-22","dow":"Thu","dm":"22 Oct","wk":10,"we":false,"ph":"First pass","am":"Cold recall: Ethics LM1","mid":"Alternative Investments LM6-7 \u2014 3 days back\nEconomics LM3-4 \u2014 10 days back","pm":["Watch: Ethics LM2 - Code of Ethics and Standards of Professional Conduct \u2014 1.5h","Practice: Ethics LM2 - 80 Qs (part) \u2014 0.9h"],"hrs":2.5,"q":0,"goal":"Progress on Ethics","topic":"Ethics"},{"dt":"2026-10-23","dow":"Fri","dm":"23 Oct","wk":10,"we":false,"ph":"First pass","am":"Cold recall: Ethics LM2","mid":"Alternative Investments LM7; Ethics LM1 \u2014 3 days back\nEconomics LM4 \u2014 10 days back","pm":["Practice: Ethics LM2 - 80 Qs (continued) \u2014 1.7h","Watch: Ethics LM3 - Guidance for Standards I-VII (part) \u2014 0.7h"],"hrs":2.5,"q":80,"goal":"Finish Ethics LM2","topic":"Ethics"},{"dt":"2026-10-24","dow":"Sat","dm":"24 Oct","wk":10,"we":true,"ph":"First pass","am":"Watch: Ethics LM3 - Guidance for Standards I-VII (continued) \u2014 0.8h\nPractice: Ethics LM3 - 80 Qs \u2014 2.7h\nWatch: Ethics LM4 - Introduction to the Global Investment Performance Standards (GIPS) \u2014 1.5h","mid":"Ethics LM1 \u2014 3 days back\nEconomics LM5 \u2014 10 days back","pm":["Practice: Ethics LM4 - 80 Qs (part) \u2014 1.3h"],"hrs":6.3,"q":80,"goal":"Finish Ethics LM3","topic":"Ethics"},{"dt":"2026-10-25","dow":"Sun","dm":"25 Oct","wk":10,"we":true,"ph":"First pass","am":"Practice: Ethics LM4 - 80 Qs (continued) \u2014 1.4h\nWatch: Ethics LM5 - Ethics Application \u2014 1.5h","mid":"Ethics LM2 \u2014 3 days back\nEconomics LM5-6 \u2014 10 days back","pm":["Practice: Ethics LM5 - 80 Qs \u2014 2.7h"],"hrs":5.6,"q":160,"goal":"Finish Ethics LM4-5","topic":"Ethics"},{"dt":"2026-10-26","dow":"Mon","dm":"26 Oct","wk":11,"we":false,"ph":"Review","am":"Recall: Ethics LM1-3 Standards","mid":"Alt Inv \u2014 30-min skim of all 7 LMs","pm":["Ethics LM4 GIPS \u2014 videos + 80 Qs"],"hrs":3.0,"q":80,"goal":"Finish GIPS","topic":"Ethics"},{"dt":"2026-10-27","dow":"Tue","dm":"27 Oct","wk":11,"we":false,"ph":"Review","am":"Recall: GIPS key concepts","mid":"Ethics LM1-2 \u2014 Code + Standards structure","pm":["Ethics LM5 Ethics Application \u2014 videos + 80 Qs"],"hrs":3.0,"q":80,"goal":"Last new module of the curriculum","topic":"Ethics"},{"dt":"2026-10-28","dow":"Wed","dm":"28 Oct","wk":11,"we":false,"ph":"Review","am":"Recall: Ethics Application cases","mid":"Alt Inv + Port Mgmt flagged Qs","pm":["Ethics consolidation \u2014 build a 1-page Standards I-VII sheet from memory, then check"],"hrs":2.75,"q":40,"goal":"Standards one-pager","topic":"Ethics"},{"dt":"2026-10-29","dow":"Thu","dm":"29 Oct","wk":11,"we":false,"ph":"Review","am":"Recall: Standards one-pager","mid":"Economics \u2014 FX and exchange rate calcs","pm":["FSA review \u2014 formula sheet + re-do every flagged FSA question"],"hrs":2.75,"q":60,"goal":"FSA formula sheet done","topic":"FSA"},{"dt":"2026-10-30","dow":"Fri","dm":"30 Oct","wk":11,"we":false,"ph":"Review","am":"Recall: FSA ratios and DuPont","mid":"Equity + Corp Issuers flagged Qs","pm":["Quant review \u2014 formula sheet + flagged Qs. Set out everything for tomorrow's mock"],"hrs":2.75,"q":60,"goal":"Mock logistics ready tonight","topic":"Quant"},{"dt":"2026-10-31","dow":"Sat","dm":"31 Oct","wk":11,"we":true,"ph":"MOCK","am":"MOCK 1 \u2014 full 180 Q. Start 8:00am sharp. Two 2h15 sessions, one break. No notes, no pausing.","mid":"","pm":["Score it. Tag every miss by topic and root cause into the Error Log. Do not fix them yet."],"hrs":7.5,"q":180,"goal":"MOCK 1 \u2014 baseline","topic":"All"},{"dt":"2026-11-01","dow":"Sun","dm":"1 Nov","wk":11,"we":true,"ph":"Review","am":"Mock 1 \u2014 work every miss to root cause","mid":"","pm":["Fixed Income review \u2014 duration, convexity, spot/forward. Re-do flagged FI Qs"],"hrs":7.0,"q":80,"goal":"Every Mock 1 miss understood","topic":"Mixed"},{"dt":"2026-11-02","dow":"Mon","dm":"2 Nov","wk":12,"we":false,"ph":"Review","am":"Recall: FI duration and convexity","mid":"Mock 1 error log \u2014 first re-test pass","pm":["Weakest topic from Mock 1 \u2014 targeted re-watch + 40 Qs"],"hrs":2.75,"q":40,"goal":"Close weak area #1","topic":"Weak #1"},{"dt":"2026-11-03","dow":"Tue","dm":"3 Nov","wk":12,"we":false,"ph":"Review","am":"Recall: weak topic #1","mid":"Derivatives \u2014 put-call parity, binomial","pm":["Second weakest topic from Mock 1 \u2014 targeted re-watch + 40 Qs"],"hrs":2.75,"q":40,"goal":"Close weak area #2","topic":"Weak #2"},{"dt":"2026-11-04","dow":"Wed","dm":"4 Nov","wk":12,"we":false,"ph":"MOCK","am":"Recall: weak topics #1 and #2","mid":"Ethics Standards drill \u2014 20 Qs","pm":["HALF-MOCK A \u2014 90 Qs, timed 2h15, mixed topics. Score immediately"],"hrs":2.75,"q":90,"goal":"Half-mock A","topic":"All"},{"dt":"2026-11-05","dow":"Thu","dm":"5 Nov","wk":12,"we":false,"ph":"Review","am":"Half-mock A \u2014 review every miss","mid":"FSA + Quant formula sheets","pm":["Derivatives and Equity \u2014 formula drill + 50 Qs"],"hrs":2.75,"q":50,"goal":"Derivatives formulas cold","topic":"Mixed"},{"dt":"2026-11-06","dow":"Fri","dm":"6 Nov","wk":12,"we":false,"ph":"Review","am":"Recall: Derivatives formulas","mid":"Error Log \u2014 re-test everything flagged so far","pm":["Ethics \u2014 Standards drill, 60 Qs. Light night before the mock"],"hrs":2.5,"q":60,"goal":"Ethics above 75%","topic":"Ethics"},{"dt":"2026-11-07","dow":"Sat","dm":"7 Nov","wk":12,"we":true,"ph":"MOCK","am":"MOCK 2 \u2014 full 180 Q. 8:00am start, same conditions as Mock 1.","mid":"","pm":["Score and tag every miss. Compare topic scores against Mock 1 in the Mock Log"],"hrs":7.5,"q":180,"goal":"MOCK 2 \u2014 expect +8 to +12 pts","topic":"All"},{"dt":"2026-11-08","dow":"Sun","dm":"8 Nov","wk":12,"we":true,"ph":"Review","am":"Mock 2 \u2014 work every miss to root cause","mid":"","pm":["Error Log full re-test: every question flagged since 31 Oct, done cold"],"hrs":7.0,"q":100,"goal":"Error log cleared","topic":"Mixed"},{"dt":"2026-11-09","dow":"Mon","dm":"9 Nov","wk":13,"we":false,"ph":"Review","am":"Recall: Mock 2 weak areas","mid":"Portfolio Management \u2014 CAPM, Sharpe, beta","pm":["Weakest topic from Mock 2 \u2014 targeted re-watch + 40 Qs"],"hrs":2.75,"q":40,"goal":"Close weak area #3","topic":"Weak #3"},{"dt":"2026-11-10","dow":"Tue","dm":"10 Nov","wk":13,"we":false,"ph":"MOCK","am":"Recall: PM ratios","mid":"Economics \u2014 business cycles, monetary/fiscal","pm":["MOCK 3 SESSION 1 \u2014 Qs 1-90, timed 2h15"],"hrs":2.75,"q":90,"goal":"Mock 3 first half","topic":"All"},{"dt":"2026-11-11","dow":"Wed","dm":"11 Nov","wk":13,"we":false,"ph":"MOCK","am":"Recall: Mock 3 session 1 shaky items","mid":"FSA \u2014 inventories, long-lived assets, taxes","pm":["MOCK 3 SESSION 2 \u2014 Qs 91-180, timed 2h15. Score the full mock"],"hrs":2.75,"q":90,"goal":"Mock 3 complete","topic":"All"},{"dt":"2026-11-12","dow":"Thu","dm":"12 Nov","wk":13,"we":false,"ph":"Review","am":"Mock 3 \u2014 work every miss","mid":"Fixed Income + Derivatives quick drill","pm":["Full formula sheet pass \u2014 every topic, written out from memory"],"hrs":2.75,"q":40,"goal":"Formula sheet cold","topic":"All"},{"dt":"2026-11-13","dow":"Fri","dm":"13 Nov","wk":13,"we":false,"ph":"Review","am":"Recall: formula sheet gaps","mid":"Quant \u2014 hypothesis testing decision tree","pm":["Ethics full re-read: Standards I-VII + GIPS + 50 Qs. Pack the exam bag tonight"],"hrs":2.75,"q":50,"goal":"Ethics is the biggest single weight \u2014 own it","topic":"Ethics"},{"dt":"2026-11-14","dow":"Sat","dm":"14 Nov","wk":13,"we":true,"ph":"MOCK","am":"MOCK 4 \u2014 FINAL. 8:00am, exact exam conditions. This is the dress rehearsal.","mid":"","pm":["Score it, then stop. Light skim of misses only \u2014 no new material from here"],"hrs":6.0,"q":180,"goal":"MOCK 4 \u2014 final calibration","topic":"All"},{"dt":"2026-11-15","dow":"Sun","dm":"15 Nov","wk":13,"we":true,"ph":"Taper","am":"Formula sheet skim + Ethics one-pager. Nothing new.","mid":"","pm":["Confirm test centre route and arrival time. Lay out ID and materials. Early night \u2014 sleep is worth more than another hour of Qs now"],"hrs":2.0,"q":0,"goal":"TAPER \u2014 protect the sleep","topic":"\u2014"},{"dt":"2026-11-16","dow":"Mon","dm":"16 Nov","wk":14,"we":false,"ph":"EXAM","am":"","mid":"","pm":[],"hrs":0,"q":0,"goal":"Arrive early. Trust the preparation.","topic":""}],"mods":[{"s":1,"t":"FSA","lm":1,"n":"Introduction to Financial Statement Analysis","v":3,"vh":1.5,"q":70},{"s":2,"t":"FSA","lm":2,"n":"Analyzing Income Statements","v":3,"vh":1.5,"q":70},{"s":3,"t":"FSA","lm":3,"n":"Analyzing Balance Sheets","v":3,"vh":1.5,"q":70},{"s":4,"t":"FSA","lm":4,"n":"Analyzing Statements of Cash Flows I","v":3,"vh":1.5,"q":70},{"s":5,"t":"FSA","lm":5,"n":"Analyzing Statements of Cash Flows II","v":3,"vh":1.5,"q":70},{"s":6,"t":"FSA","lm":6,"n":"Analysis of Inventories","v":2,"vh":1.5,"q":70},{"s":7,"t":"FSA","lm":7,"n":"Analysis of Long-Term Assets","v":3,"vh":1.5,"q":70},{"s":8,"t":"FSA","lm":8,"n":"Topics in Long-Term Liabilities and Equity","v":3,"vh":1.5,"q":70},{"s":9,"t":"FSA","lm":9,"n":"Analysis of Income Taxes","v":3,"vh":1.5,"q":70},{"s":10,"t":"FSA","lm":10,"n":"Financial Reporting Quality","v":3,"vh":1.5,"q":70},{"s":11,"t":"FSA","lm":11,"n":"Financial Analysis Techniques","v":3,"vh":1.5,"q":70},{"s":12,"t":"FSA","lm":12,"n":"Introduction to Financial Statement Modeling","v":2,"vh":1.5,"q":70},{"s":13,"t":"Quant","lm":1,"n":"Rates and Returns","v":3,"vh":1.2,"q":50},{"s":14,"t":"Quant","lm":2,"n":"Time Value of Money in Finance","v":3,"vh":1.2,"q":50},{"s":15,"t":"Quant","lm":3,"n":"Statistical Measures of Asset Returns","v":3,"vh":1.2,"q":50},{"s":16,"t":"Quant","lm":4,"n":"Probability Trees and Conditional Expectations","v":3,"vh":1.2,"q":50},{"s":17,"t":"Quant","lm":5,"n":"Portfolio Mathematics","v":3,"vh":1.2,"q":50},{"s":18,"t":"Quant","lm":6,"n":"Simulation Methods","v":3,"vh":1.2,"q":50},{"s":19,"t":"Quant","lm":7,"n":"Estimation and Inference","v":3,"vh":1.2,"q":50},{"s":20,"t":"Quant","lm":8,"n":"Hypothesis Testing","v":3,"vh":1.2,"q":50},{"s":21,"t":"Quant","lm":9,"n":"Parametric and Non-Parametric Tests of Independence","v":3,"vh":1.2,"q":50},{"s":22,"t":"Quant","lm":10,"n":"Simple Linear Regression","v":3,"vh":1.2,"q":50},{"s":23,"t":"Quant","lm":11,"n":"Introduction to Big Data Techniques","v":3,"vh":1.2,"q":50},{"s":24,"t":"Fixed Income","lm":1,"n":"Fixed-Income Instrument Features","v":2,"vh":0.5,"q":40},{"s":25,"t":"Fixed Income","lm":2,"n":"Fixed-Income Cash Flows and Types","v":2,"vh":0.5,"q":40},{"s":26,"t":"Fixed Income","lm":3,"n":"Fixed-Income Issuance and Trading","v":3,"vh":0.5,"q":40},{"s":27,"t":"Fixed Income","lm":4,"n":"Fixed-Income Markets for Corporate Issuers","v":2,"vh":0.5,"q":40},{"s":28,"t":"Fixed Income","lm":5,"n":"Fixed-Income Markets for Government Issuers","v":2,"vh":0.5,"q":40},{"s":29,"t":"Fixed Income","lm":6,"n":"Fixed-Income Bond Valuation: Prices and Yields","v":3,"vh":0.5,"q":40},{"s":30,"t":"Fixed Income","lm":7,"n":"Yield and Yield Spread Measures for Fixed-Rate Bonds","v":2,"vh":0.5,"q":40},{"s":31,"t":"Fixed Income","lm":8,"n":"Yield and Yield Spread Measures for Floating-Rate Instruments","v":2,"vh":0.5,"q":40},{"s":32,"t":"Fixed Income","lm":9,"n":"Term Structure: Spot, Par, and Forward Curves","v":3,"vh":0.5,"q":40},{"s":33,"t":"Fixed Income","lm":10,"n":"Interest Rate Risk and Return","v":2,"vh":0.5,"q":40},{"s":34,"t":"Fixed Income","lm":11,"n":"Yield-Based Bond Duration Measures and Properties","v":2,"vh":0.5,"q":40},{"s":35,"t":"Fixed Income","lm":12,"n":"Yield-Based Bond Convexity and Portfolio Properties","v":3,"vh":0.5,"q":40},{"s":36,"t":"Fixed Income","lm":13,"n":"Curve-Based and Empirical Fixed-Income Risk Measures","v":2,"vh":0.5,"q":40},{"s":37,"t":"Fixed Income","lm":14,"n":"Credit Risk","v":2,"vh":0.5,"q":40},{"s":38,"t":"Fixed Income","lm":15,"n":"Credit Analysis for Government Issuers","v":3,"vh":0.5,"q":40},{"s":39,"t":"Fixed Income","lm":16,"n":"Credit Analysis for Corporate Issuers","v":2,"vh":0.5,"q":40},{"s":40,"t":"Fixed Income","lm":17,"n":"Fixed-Income Securitization","v":2,"vh":0.5,"q":40},{"s":41,"t":"Fixed Income","lm":18,"n":"Asset-Backed Security (ABS) Instrument and Market Features","v":3,"vh":0.5,"q":40},{"s":42,"t":"Fixed Income","lm":19,"n":"Mortgage-Backed Security (MBS) Instrument and Market Features","v":2,"vh":0.5,"q":40},{"s":43,"t":"Derivatives","lm":1,"n":"Derivative Instrument and Derivative Market Features","v":2,"vh":0.7,"q":45},{"s":44,"t":"Derivatives","lm":2,"n":"Forward Commitment and Contingent Claim Features","v":2,"vh":0.7,"q":45},{"s":45,"t":"Derivatives","lm":3,"n":"Derivative Benefits, Risks, and Issuer/Investor Uses","v":2,"vh":0.7,"q":45},{"s":46,"t":"Derivatives","lm":4,"n":"Arbitrage, Replication, and the Cost of Carry","v":3,"vh":0.7,"q":45},{"s":47,"t":"Derivatives","lm":5,"n":"Pricing and Valuation of Forward Contracts","v":2,"vh":0.7,"q":45},{"s":48,"t":"Derivatives","lm":6,"n":"Pricing and Valuation of Futures Contracts","v":2,"vh":0.7,"q":45},{"s":49,"t":"Derivatives","lm":7,"n":"Pricing and Valuation of Interest Rate and Other Swaps","v":2,"vh":0.7,"q":45},{"s":50,"t":"Derivatives","lm":8,"n":"Pricing and Valuation of Options","v":2,"vh":0.7,"q":45},{"s":51,"t":"Derivatives","lm":9,"n":"Option Replication Using Put-Call Parity","v":3,"vh":0.7,"q":45},{"s":52,"t":"Derivatives","lm":10,"n":"Valuing a Derivative Using a One-Period Binomial Model","v":2,"vh":0.7,"q":45},{"s":53,"t":"Equity","lm":1,"n":"Market Organization and Structure","v":3,"vh":1.3,"q":70},{"s":54,"t":"Equity","lm":2,"n":"Security Market Indexes","v":2,"vh":1.3,"q":70},{"s":55,"t":"Equity","lm":3,"n":"Market Efficiency","v":3,"vh":1.3,"q":70},{"s":56,"t":"Equity","lm":4,"n":"Overview of Equity Securities","v":3,"vh":1.3,"q":70},{"s":57,"t":"Equity","lm":5,"n":"Company Analysis: Past and Present","v":2,"vh":1.3,"q":70},{"s":58,"t":"Equity","lm":6,"n":"Industry and Competitive Analysis","v":3,"vh":1.3,"q":70},{"s":59,"t":"Equity","lm":7,"n":"Company Analysis: Forecasting","v":3,"vh":1.3,"q":70},{"s":60,"t":"Equity","lm":8,"n":"Equity Valuation: Concepts and Basic Tools","v":2,"vh":1.3,"q":70},{"s":61,"t":"Corporate Issuers","lm":1,"n":"Organizational Forms, Issuer Features, and Ownership","v":2,"vh":0.8,"q":50},{"s":62,"t":"Corporate Issuers","lm":2,"n":"Investors and Other Stakeholders","v":2,"vh":0.8,"q":50},{"s":63,"t":"Corporate Issuers","lm":3,"n":"Corporate Governance: Conflicts, Mechanisms, Risks, Benefits","v":2,"vh":0.8,"q":50},{"s":64,"t":"Corporate Issuers","lm":4,"n":"Working Capital and Liquidity","v":2,"vh":0.8,"q":50},{"s":65,"t":"Corporate Issuers","lm":5,"n":"Capital Investments and Capital Allocation","v":2,"vh":0.8,"q":50},{"s":66,"t":"Corporate Issuers","lm":6,"n":"Capital Structure","v":2,"vh":0.8,"q":50},{"s":67,"t":"Corporate Issuers","lm":7,"n":"Business Models","v":2,"vh":0.8,"q":50},{"s":68,"t":"Portfolio Management","lm":1,"n":"Portfolio Risk and Return: Part I","v":3,"vh":1.5,"q":55},{"s":69,"t":"Portfolio Management","lm":2,"n":"Portfolio Risk and Return: Part II","v":4,"vh":1.5,"q":55},{"s":70,"t":"Portfolio Management","lm":3,"n":"Portfolio Management: An Overview","v":3,"vh":1.5,"q":55},{"s":71,"t":"Portfolio Management","lm":4,"n":"Basics of Portfolio Planning and Construction","v":3,"vh":1.5,"q":55},{"s":72,"t":"Portfolio Management","lm":5,"n":"The Behavioral Biases of Individuals","v":4,"vh":1.5,"q":55},{"s":73,"t":"Portfolio Management","lm":6,"n":"Introduction to Risk Management","v":3,"vh":1.5,"q":55},{"s":74,"t":"Economics","lm":1,"n":"The Firm and Market Structures","v":3,"vh":1.5,"q":50},{"s":75,"t":"Economics","lm":2,"n":"Understanding Business Cycles","v":3,"vh":1.5,"q":50},{"s":76,"t":"Economics","lm":3,"n":"Fiscal Policy","v":3,"vh":1.5,"q":50},{"s":77,"t":"Economics","lm":4,"n":"Monetary Policy","v":3,"vh":1.5,"q":50},{"s":78,"t":"Economics","lm":5,"n":"Introduction to Geopolitics","v":3,"vh":1.5,"q":50},{"s":79,"t":"Economics","lm":6,"n":"International Trade","v":3,"vh":1.5,"q":50},{"s":80,"t":"Economics","lm":7,"n":"Capital Flows and the FX Market","v":3,"vh":1.5,"q":50},{"s":81,"t":"Economics","lm":8,"n":"Exchange Rate Calculations","v":2,"vh":1.5,"q":50},{"s":82,"t":"Alternative Investments","lm":1,"n":"Alternative Investment Features, Methods, and Structures","v":1,"vh":0.4,"q":30},{"s":83,"t":"Alternative Investments","lm":2,"n":"Alternative Investment Performance and Returns","v":1,"vh":0.4,"q":30},{"s":84,"t":"Alternative Investments","lm":3,"n":"Investments in Private Capital: Equity and Debt","v":2,"vh":0.4,"q":30},{"s":85,"t":"Alternative Investments","lm":4,"n":"Real Estate and Infrastructure","v":1,"vh":0.4,"q":30},{"s":86,"t":"Alternative Investments","lm":5,"n":"Natural Resources","v":1,"vh":0.4,"q":30},{"s":87,"t":"Alternative Investments","lm":6,"n":"Hedge Funds","v":2,"vh":0.4,"q":30},{"s":88,"t":"Alternative Investments","lm":7,"n":"Introduction to Digital Assets","v":1,"vh":0.4,"q":30},{"s":89,"t":"Ethics","lm":1,"n":"Ethics and Trust in the Investment Profession","v":2,"vh":1.5,"q":80},{"s":90,"t":"Ethics","lm":2,"n":"Code of Ethics and Standards of Professional Conduct","v":2,"vh":1.5,"q":80},{"s":91,"t":"Ethics","lm":3,"n":"Guidance for Standards I-VII","v":2,"vh":1.5,"q":80},{"s":92,"t":"Ethics","lm":4,"n":"Introduction to the Global Investment Performance Standards (GIPS)","v":3,"vh":1.5,"q":80},{"s":93,"t":"Ethics","lm":5,"n":"Ethics Application","v":2,"vh":1.5,"q":80}],"topics":[{"n":"FSA","w":"11-14%"},{"n":"Quant","w":"6-9%"},{"n":"Fixed Income","w":"11-14%"},{"n":"Derivatives","w":"5-8%"},{"n":"Equity","w":"11-14%"},{"n":"Corporate Issuers","w":"6-9%"},{"n":"Portfolio Management","w":"8-12%"},{"n":"Economics","w":"6-9%"},{"n":"Alternative Investments","w":"7-10%"},{"n":"Ethics","w":"15-20%"}]};
+const EXAM = "2026-11-16";
+const TOTAL_Q = DATA.mods.reduce((a, m) => a + m.q, 0);
+
+let STORE = { days: {}, mods: {} };
+let cursorDate = (() => {
+  const t = todayISO();
+  return DATA.days.find(d => d.dt === t) ? t : DATA.days[0].dt;
+})();
+let currentTab = "today";
+let openGroup = null;
+let modalOpen = null;
+let importError = "";
+let copyFeedback = "";
+
+function todayISO() {
+  const n = new Date();
+  return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
+}
+function daysBetween(a, b) {
+  return Math.round((new Date(b + "T00:00:00") - new Date(a + "T00:00:00")) / 864e5);
+}
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function isDayComplete(day, entry) {
+  const e = entry || {};
+  const need = [!!day.am, !!day.mid, !!(day.pm && day.pm.length)];
+  const got = [!!e.am, !!e.mid, !!e.pm];
+  const total = need.filter(Boolean).length;
+  const hit = need.map((n, i) => n && got[i]).filter(Boolean).length;
+  return total > 0 && hit === total;
+}
+function computeStats() {
+  let hours = 0, daysDone = 0;
+  DATA.days.forEach(d => {
+    const e = STORE.days[d.dt];
+    if (e) hours += Number(e.hrs) || 0;
+    if (isDayComplete(d, e)) daysDone++;
+  });
+  let qDone = 0, qCorrect = 0, modsDone = 0;
+  DATA.mods.forEach(m => {
+    const s = STORE.mods[m.s];
+    if (s) {
+      qDone += Number(s.qd) || 0;
+      qCorrect += Number(s.qc) || 0;
+      if (s.v) modsDone++;
+    }
+  });
+  const acc = qDone ? qCorrect / qDone : 0;
+  return { hours, daysDone, qDone, qCorrect, modsDone, acc };
+}
+function setDayPatch(dt, patch) {
+  STORE.days[dt] = { ...(STORE.days[dt] || {}), ...patch };
+}
+function setModPatch(s, patch) {
+  STORE.mods[s] = { ...(STORE.mods[s] || {}), ...patch };
+}
+
+/* ---------- render pieces ---------- */
+function checkSvg() {
+  return `<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6.2l2.4 2.4L9.6 3.9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+function renderBlock(tag, time, body, checked, accent, dataAttrs) {
+  if (!body || (Array.isArray(body) && !body.length)) return "";
+  const lines = Array.isArray(body) ? body : String(body).split("\n");
+  const linesHtml = lines.map(l => `<div class="block-line ${checked ? "done" : ""}">${esc(l)}</div>`).join("");
+  return `
+  <button class="block" data-action="toggle-block" ${dataAttrs}>
+    <div class="checkbox ${checked ? "checked" : ""}" style="--accent:${accent}">${checked ? checkSvg() : ""}</div>
+    <div class="block-body">
+      <div style="display:flex;gap:8px;align-items:baseline;margin-bottom:3px;">
+        <span class="eyebrow" style="color:${accent}">${esc(tag)}</span>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--soft);">${esc(time)}</span>
+      </div>
+      ${linesHtml}
+    </div>
+  </button>`;
+}
+function ring(pct, label, sub, color) {
+  const size = 62, stroke = 5, r = (size - stroke) / 2, c = 2 * Math.PI * r;
+  const dash = c * (1 - Math.min(1, pct || 0));
+  return `
+  <div style="position:relative;width:${size}px;height:${size}px;">
+    <svg width="${size}" height="${size}" style="transform:rotate(-90deg);">
+      <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="var(--rule)" stroke-width="${stroke}"/>
+      <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}"
+        stroke-dasharray="${c}" stroke-dashoffset="${dash}" stroke-linecap="round" style="transition:stroke-dashoffset .6s;"/>
+    </svg>
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+      <div style="font-family:var(--mono);font-size:14px;font-weight:700;">${label}</div>
+      ${sub ? `<div style="font-family:var(--mono);font-size:8px;color:var(--soft);">${sub}</div>` : ""}
+    </div>
+  </div>`;
+}
+function renderHeader(stats) {
+  const left = Math.max(0, daysBetween(todayISO(), EXAM));
+  return `
+  <div class="header">
+    <div>
+      <div class="eyebrow">CFA Level I &middot; 16 Nov 2026</div>
+      <div style="display:flex;align-items:baseline;gap:7px;margin-top:3px;">
+        <span class="days-out">${left}</span>
+        <span class="days-out-label">days out</span>
+      </div>
+    </div>
+    <div style="text-align:right;">
+      <div class="stat-line">${stats.modsDone}/93 modules</div>
+      <div class="stat-line">${stats.qDone.toLocaleString()}/${TOTAL_Q.toLocaleString()} Qs</div>
+      <button data-action="open-export" class="save-btn">&#10515; Save / Load progress</button>
+    </div>
+  </div>`;
+}
+function renderRunway() {
+  const t = todayISO();
+  const bars = DATA.days.map(d => {
+    const e = STORE.days[d.dt] || {};
+    const any = e.am || e.pm || e.mid;
+    const past = d.dt < t;
+    const isToday = d.dt === t;
+    const complete = isDayComplete(d, e);
+    let bg = "var(--rule)", h = d.we ? 18 : 12;
+    if (d.ph === "MOCK") { bg = "var(--brassSoft)"; h = 24; }
+    if (d.ph === "EXAM") { bg = "var(--rust)"; h = 30; }
+    if (complete) bg = "var(--pine)";
+    else if (any) bg = "#8FB8AC";
+    else if (past && d.ph !== "EXAM") bg = "var(--rustSoft)";
+    const outline = cursorDate === d.dt ? "2px solid var(--ink)" : isToday ? "2px solid var(--brass)" : "none";
+    return `<button data-action="pick-day" data-dt="${d.dt}" title="${esc(d.dow + " " + d.dm)}" style="height:${h}px;background:${bg};outline:${outline};outline-offset:1px;"></button>`;
+  }).join("");
+  return `<div class="runway">${bars}</div>
+  <div class="runway-labels"><span>15 AUG</span><span>tap any day &middot; tall bars are mocks</span><span style="color:var(--rust);">16 NOV</span></div>`;
+}
+function renderToday(stats) {
+  const day = DATA.days.find(d => d.dt === cursorDate) || DATA.days[0];
+  const idx = DATA.days.findIndex(d => d.dt === cursorDate);
+  const e = STORE.days[cursorDate] || {};
+  const exam = day.ph === "EXAM";
+  const mock = day.ph === "MOCK";
+  const accent = mock ? "var(--brass)" : "var(--pine)";
+  const need = [!!day.am, !!day.mid, !!(day.pm && day.pm.length)];
+  const got = [!!e.am, !!e.mid, !!e.pm];
+  const total = need.filter(Boolean).length;
+  const hit = need.map((n, i) => n && got[i]).filter(Boolean).length;
+
+  const nav = `
+  <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+    <button data-action="prev-day" class="nav-btn" ${idx === 0 ? "disabled" : ""}>&larr; prev</button>
+    ${cursorDate !== todayISO() ? `<button data-action="jump-today" class="jump-btn">jump to today</button>` : "<span></span>"}
+    <button data-action="next-day" class="nav-btn" ${idx === DATA.days.length - 1 ? "disabled" : ""}>next &rarr;</button>
+  </div>`;
+
+  if (exam) {
+    return nav + `
+    <div style="padding:48px 20px;text-align:center;">
+      <div class="eyebrow" style="color:var(--rust)">Monday 16 November</div>
+      <div style="font-size:34px;font-weight:800;letter-spacing:-.03em;margin:12px 0 8px;">Exam day</div>
+      <p style="color:var(--soft);font-size:14px;max-width:300px;margin:0 auto;line-height:1.6;">
+        ${esc(day.goal)} You put in ${stats.hours.toFixed(0)} logged hours and ${stats.qDone.toLocaleString()} questions to get here.
+      </p>
+    </div>`;
+  }
+
+  const qd = e.qd, qc = e.qc;
+  const showAcc = qd > 0 && qc !== undefined && qc !== "";
+  const accVal = showAcc ? Number(qc) / Number(qd) : null;
+  const accColor = accVal === null ? "" : (accVal >= 0.72 ? "var(--pine)" : accVal < 0.6 ? "var(--rust)" : "var(--brass)");
+
+  return nav + `
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+    <div>
+      <div class="eyebrow" style="color:${mock ? "var(--brass)" : "var(--soft)"}">${esc(day.dow)} ${esc(day.dm)} &middot; Week ${day.wk} ${mock ? "&middot; Mock day" : ""}</div>
+      <div style="font-size:20px;font-weight:700;letter-spacing:-.02em;margin-top:5px;line-height:1.25;">${esc(day.goal)}</div>
+    </div>
+    <div style="text-align:right;flex-shrink:0;padding-left:12px;">
+      <div style="font-family:var(--mono);font-size:19px;font-weight:700;color:${accent};">${hit}/${total}</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--soft);">${day.hrs}h &middot; ${day.q} Q</div>
+    </div>
+  </div>
+  <div style="margin-top:10px;">
+    ${renderBlock(day.we ? "Morning" : "Cold recall", day.we ? "~3.5 hrs" : "30 min", day.am, !!e.am, accent, `data-dt="${cursorDate}" data-slot="am"`)}
+    ${renderBlock("Midday revisit", "45 min &middot; at work", day.mid, !!e.mid, accent, `data-dt="${cursorDate}" data-slot="mid"`)}
+    ${renderBlock(day.we ? "Afternoon" : "Evening", day.we ? "~3.5 hrs" : `${day.hrs} hrs`, day.pm, !!e.pm, accent, `data-dt="${cursorDate}" data-slot="pm"`)}
+  </div>
+  <div style="border-top:1px solid var(--rule);padding-top:14px;margin-top:4px;">
+    <div class="eyebrow">Log the day</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px;">
+      <label><div class="field-label">Hours</div>
+        <input class="field-input" inputmode="decimal" placeholder="0.0" value="${esc(e.hrs ?? "")}" data-field="day" data-dt="${cursorDate}" data-prop="hrs"></label>
+      <label><div class="field-label">Qs done</div>
+        <input class="field-input" inputmode="numeric" placeholder="0" value="${esc(e.qd ?? "")}" data-field="day" data-dt="${cursorDate}" data-prop="qd"></label>
+      <label><div class="field-label">Correct</div>
+        <input class="field-input" inputmode="numeric" placeholder="0" value="${esc(e.qc ?? "")}" data-field="day" data-dt="${cursorDate}" data-prop="qc"></label>
+    </div>
+    ${showAcc ? `<div style="font-family:var(--mono);font-size:11px;color:${accColor};margin-top:8px;">${Math.round(accVal * 100)}% today${accVal < 0.6 ? " &mdash; log the misses while they're fresh" : ""}</div>` : ""}
+    <textarea class="note-input" placeholder="Notes &mdash; what was shaky?" rows="2" data-field="day" data-dt="${cursorDate}" data-prop="note">${esc(e.note ?? "")}</textarea>
+  </div>`;
+}
+function renderModuleItem(m) {
+  const s = STORE.mods[m.s] || {};
+  const qd = s.qd, qc = s.qc;
+  const showAcc = qd > 0 && qc !== "" && qc !== undefined;
+  const acc = showAcc ? qc / qd : null;
+  const accColor = acc === null ? "" : (acc >= 0.72 ? "var(--pine)" : acc < 0.6 ? "var(--rust)" : "var(--brass)");
+  const stars = [1, 2, 3, 4, 5].map(n => `
+    <button data-action="set-confidence" data-mod="${m.s}" data-n="${n}" title="Confidence ${n}"
+      style="width:17px;height:17px;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:9px;padding:0;
+      border:1px solid ${s.c >= n ? "var(--pine)" : "var(--rule)"};background:${s.c >= n ? "var(--pine)" : "transparent"};color:${s.c >= n ? "#fff" : "var(--soft)"};">${n}</button>
+  `).join("");
+  return `
+  <div style="padding:9px 2px 9px 10px;border-left:2px solid ${s.v ? "var(--pine)" : "var(--rule)"};margin-bottom:6px;">
+    <div style="display:flex;gap:8px;align-items:flex-start;">
+      <div style="flex:1;">
+        <div style="font-size:12.5px;line-height:1.35;color:${s.v ? "var(--soft)" : "var(--ink)"};">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--soft);">LM${m.lm} &middot; </span>${esc(m.n)}
+        </div>
+        <div style="font-family:var(--mono);font-size:9.5px;color:var(--soft);margin-top:3px;">${m.v} videos &middot; ${m.vh}h @1.5x &middot; ${m.q} Qs target</div>
+      </div>
+      <button data-action="toggle-module" data-mod="${m.s}" style="font-family:var(--mono);font-size:9.5px;padding:4px 8px;border-radius:5px;
+        border:1px solid ${s.v ? "var(--pine)" : "var(--rule)"};cursor:pointer;background:${s.v ? "var(--pine)" : "transparent"};color:${s.v ? "#fff" : "var(--soft)"};flex-shrink:0;">${s.v ? "DONE" : "MARK"}</button>
+    </div>
+    <div style="display:flex;gap:6px;margin-top:7px;align-items:center;">
+      <input class="mini-input" style="width:52px;" inputmode="numeric" placeholder="Qs" value="${esc(s.qd ?? "")}" data-field="mod" data-mod="${m.s}" data-prop="qd">
+      <input class="mini-input" style="width:58px;" inputmode="numeric" placeholder="Right" value="${esc(s.qc ?? "")}" data-field="mod" data-mod="${m.s}" data-prop="qc">
+      ${showAcc ? `<span style="font-family:var(--mono);font-size:10.5px;font-weight:700;color:${accColor};">${Math.round(acc * 100)}%</span>` : ""}
+      <span style="margin-left:auto;display:flex;gap:3px;">${stars}</span>
+    </div>
+  </div>`;
+}
+function renderModules() {
+  const groups = DATA.topics.map(t => ({ ...t, items: DATA.mods.filter(m => m.t === t.n) }));
+  return groups.map(g => {
+    const done = g.items.filter(m => (STORE.mods[m.s] || {}).v).length;
+    const isOpen = openGroup === g.n;
+    const itemsHtml = isOpen ? `<div style="padding-bottom:8px;">${g.items.map(m => renderModuleItem(m)).join("")}</div>` : "";
+    return `
+    <div style="border-top:1px solid var(--rule);">
+      <button class="group-header" data-action="toggle-group" data-topic="${esc(g.n)}">
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:650;">${esc(g.n)}</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--soft);margin-top:2px;">${esc(g.w)} exam weight &middot; ${g.items.length} modules</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:${done === g.items.length ? "var(--pine)" : "var(--soft)"}">${done}/${g.items.length}</div>
+        <span style="color:var(--soft);font-size:11px;display:inline-block;transform:${isOpen ? "rotate(90deg)" : "none"};transition:transform .2s;">&#9654;</span>
+      </button>
+      ${itemsHtml}
+    </div>`;
+  }).join("");
+}
+function renderProgress(stats) {
+  const weak = DATA.mods.map(m => ({ ...m, s2: STORE.mods[m.s] || {} })).filter(m => m.s2.c && m.s2.c <= 2).slice(0, 8);
+  const byTopic = DATA.topics.map(t => {
+    const items = DATA.mods.filter(m => m.t === t.n);
+    const done = items.filter(m => (STORE.mods[m.s] || {}).v).length;
+    let qd = 0, qc = 0;
+    items.forEach(m => { const s = STORE.mods[m.s] || {}; qd += Number(s.qd) || 0; qc += Number(s.qc) || 0; });
+    return { ...t, done, tot: items.length, qd, qc };
+  });
+  const rings = `
+  <div style="display:flex;gap:16px;justify-content:space-around;padding:6px 0 18px;">
+    ${ring(stats.modsDone / 93, stats.modsDone, "of 93", "var(--pine)")}
+    ${ring(stats.qDone / TOTAL_Q, Math.round((stats.qDone / TOTAL_Q) * 100) + "%", "questions", "var(--brass)")}
+    ${ring(stats.acc || 0, stats.acc ? Math.round(stats.acc * 100) + "%" : "&mdash;", "accuracy", stats.acc >= 0.72 ? "var(--pine)" : "var(--rust)")}
+  </div>`;
+  const topicList = byTopic.map(t => {
+    const acc = t.qd ? t.qc / t.qd : null;
+    return `
+    <div style="margin-bottom:11px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;align-items:baseline;">
+        <span style="font-weight:550;">${esc(t.n)}</span>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--soft);">${t.done}/${t.tot}
+          ${acc !== null ? `<span style="color:${acc >= 0.72 ? "var(--pine)" : acc < 0.6 ? "var(--rust)" : "var(--brass)"};font-weight:700;margin-left:7px;">${Math.round(acc * 100)}%</span>` : ""}
+        </span>
+      </div>
+      <div style="height:4px;background:var(--rule);border-radius:2px;overflow:hidden;">
+        <div style="height:100%;width:${(t.done / t.tot) * 100}%;background:var(--pine);transition:width .5s;"></div>
+      </div>
+    </div>`;
+  }).join("");
+  const weakHtml = weak.length ? `
+  <div style="border-top:1px solid var(--rule);padding-top:12px;margin-top:6px;">
+    <div class="eyebrow" style="color:var(--rust);">Rated 1&ndash;2 &middot; revisit these first</div>
+    <div style="margin-top:8px;">
+      ${weak.map(m => `<div style="font-size:12px;padding:5px 0;border-bottom:1px solid var(--rule);">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--soft);">${esc(m.t)} LM${m.lm} &middot; </span>${esc(m.n)}
+      </div>`).join("")}
+    </div>
+  </div>` : "";
+  const effort = [
+    ["Hours logged", stats.hours.toFixed(1)],
+    ["Days completed", stats.daysDone],
+    ["Questions done", stats.qDone.toLocaleString()],
+    ["Questions left", (TOTAL_Q - stats.qDone).toLocaleString()]
+  ].map(([l, v]) => `
+    <div style="background:var(--paper);border-radius:8px;padding:10px 12px;">
+      <div style="font-family:var(--mono);font-size:18px;font-weight:700;">${v}</div>
+      <div style="font-size:10.5px;color:var(--soft);margin-top:1px;">${l}</div>
+    </div>`).join("");
+  return rings + `
+  <div style="border-top:1px solid var(--rule);padding-top:12px;">
+    <div class="eyebrow">By topic</div>
+    <div style="margin-top:10px;">${topicList}</div>
+  </div>
+  ${weakHtml}
+  <div style="border-top:1px solid var(--rule);padding-top:12px;margin-top:14px;">
+    <div class="eyebrow">Effort</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">${effort}</div>
+  </div>`;
+}
+function renderExportPane(jsonPretty) {
+  return `
+  <p class="modal-help">Copy this code or download it as a file. Paste/upload it back in next time to restore your checkmarks and logged hours &mdash; this tracker doesn't save automatically.</p>
+  <textarea class="export-box" readonly onclick="this.select()">${esc(jsonPretty)}</textarea>
+  <div style="display:flex;gap:8px;margin-top:10px;">
+    <button data-action="copy-code" class="modal-btn primary">Copy code</button>
+    <button data-action="download-backup" class="modal-btn">Download .json</button>
+  </div>
+  ${copyFeedback ? `<div class="feedback">${esc(copyFeedback)}</div>` : ""}`;
+}
+function renderImportPane() {
+  return `
+  <p class="modal-help">Paste a previously exported code, or upload a downloaded backup file.</p>
+  <textarea class="export-box" id="importPasteBox" placeholder="Paste exported code here"></textarea>
+  <div style="display:flex;gap:8px;margin-top:10px;">
+    <button data-action="load-pasted" class="modal-btn primary">Load pasted code</button>
+    <button data-action="trigger-file" class="modal-btn">Upload file&hellip;</button>
+  </div>
+  <input type="file" id="importFileInput" accept=".json,application/json,.txt" style="display:none;">
+  ${importError ? `<div class="feedback error">${esc(importError)}</div>` : ""}`;
+}
+function renderModal() {
+  if (!modalOpen) return "";
+  const isExport = modalOpen === "export";
+  const jsonPretty = JSON.stringify(STORE, null, 2);
+  return `
+  <div class="overlay">
+    <div class="modal">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-size:16px;font-weight:700;">Save / Load progress</div>
+        <button data-action="close-modal" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--soft);">&times;</button>
+      </div>
+      <div class="modal-tabs">
+        <button data-action="modal-tab" data-tab="export" class="${isExport ? "active" : ""}">Export</button>
+        <button data-action="modal-tab" data-tab="import" class="${!isExport ? "active" : ""}">Import</button>
+      </div>
+      ${isExport ? renderExportPane(jsonPretty) : renderImportPane()}
+    </div>
+  </div>`;
+}
+function renderWrap(stats) {
+  return `
+  <div class="wrap">
+    ${renderHeader(stats)}
+    ${renderRunway()}
+    <div class="card">
+      ${currentTab === "today" ? renderToday(stats) : currentTab === "modules" ? renderModules() : renderProgress(stats)}
+    </div>
+    <div class="tabs">
+      <button data-action="set-tab" data-tab="today" class="${currentTab === "today" ? "active" : ""}">Today</button>
+      <button data-action="set-tab" data-tab="modules" class="${currentTab === "modules" ? "active" : ""}">Modules</button>
+      <button data-action="set-tab" data-tab="progress" class="${currentTab === "progress" ? "active" : ""}">Progress</button>
+    </div>
+    <div class="footer-note">No autosave in this version &mdash; tap &ldquo;Save / Load progress&rdquo; above to export a backup code or file, and import it next time to pick up where you left off. Module names from the CFA Institute 2026 Level I topic outlines.</div>
+  </div>
+  ${renderModal()}`;
+}
+function render() {
+  document.getElementById("app").innerHTML = renderWrap(computeStats());
+}
+
+/* ---------- save / load ---------- */
+function copyCode() {
+  const text = JSON.stringify(STORE);
+  const finish = (ok) => { copyFeedback = ok ? "Copied to clipboard." : "Couldn't copy — select the text and copy manually."; render(); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => finish(true)).catch(() => finish(false));
+  } else {
+    finish(false);
+  }
+}
+function downloadBackup() {
+  const text = JSON.stringify(STORE, null, 2);
+  const blob = new Blob([text], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const now = new Date();
+  const stamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  a.href = url;
+  a.download = `cfa-l1-tracker-progress-${stamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+function applyImportedText(raw) {
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || (!parsed.days && !parsed.mods)) throw new Error("shape");
+    STORE = { days: parsed.days || {}, mods: parsed.mods || {} };
+    modalOpen = null; importError = "";
+    render();
+  } catch (err) {
+    importError = "Couldn't read that — check the code or file and try again.";
+    render();
+  }
+}
+function loadPasted() {
+  const box = document.getElementById("importPasteBox");
+  const raw = box ? box.value.trim() : "";
+  if (!raw) { importError = "Paste your exported code first."; render(); return; }
+  applyImportedText(raw);
+}
+function handleFileImport(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => applyImportedText(String(reader.result || ""));
+  reader.onerror = () => { importError = "Could not read that file."; render(); };
+  reader.readAsText(file);
+}
+
+/* ---------- events ---------- */
+function handleClick(e) {
+  if (e.target.classList && e.target.classList.contains("overlay")) { modalOpen = null; render(); return; }
+  const el = e.target.closest("[data-action]");
+  if (!el) return;
+  const a = el.dataset.action;
+  if (a === "pick-day") { cursorDate = el.dataset.dt; currentTab = "today"; render(); }
+  else if (a === "set-tab") { currentTab = el.dataset.tab; render(); }
+  else if (a === "prev-day") { const idx = DATA.days.findIndex(d => d.dt === cursorDate); if (idx > 0) { cursorDate = DATA.days[idx - 1].dt; render(); } }
+  else if (a === "next-day") { const idx = DATA.days.findIndex(d => d.dt === cursorDate); if (idx < DATA.days.length - 1) { cursorDate = DATA.days[idx + 1].dt; render(); } }
+  else if (a === "jump-today") { const t = todayISO(); if (DATA.days.find(d => d.dt === t)) cursorDate = t; render(); }
+  else if (a === "toggle-block") { const dt = el.dataset.dt, slot = el.dataset.slot; const cur = STORE.days[dt] || {}; setDayPatch(dt, { [slot]: !cur[slot] }); render(); }
+  else if (a === "toggle-module") { const s = el.dataset.mod; const cur = STORE.mods[s] || {}; setModPatch(s, { v: !cur.v }); render(); }
+  else if (a === "set-confidence") { const s = el.dataset.mod, n = Number(el.dataset.n); const cur = STORE.mods[s] || {}; setModPatch(s, { c: cur.c === n ? null : n }); render(); }
+  else if (a === "toggle-group") { const topic = el.dataset.topic; openGroup = openGroup === topic ? null : topic; render(); }
+  else if (a === "open-export") { modalOpen = "export"; copyFeedback = ""; render(); }
+  else if (a === "close-modal") { modalOpen = null; render(); }
+  else if (a === "modal-tab") { modalOpen = el.dataset.tab; importError = ""; copyFeedback = ""; render(); }
+  else if (a === "copy-code") { copyCode(); }
+  else if (a === "download-backup") { downloadBackup(); }
+  else if (a === "load-pasted") { loadPasted(); }
+  else if (a === "trigger-file") { const f = document.getElementById("importFileInput"); if (f) f.click(); }
+}
+function handleChange(e) {
+  const t = e.target;
+  if (t.dataset && t.dataset.field === "day") { setDayPatch(t.dataset.dt, { [t.dataset.prop]: t.value }); render(); }
+  else if (t.dataset && t.dataset.field === "mod") { setModPatch(t.dataset.mod, { [t.dataset.prop]: t.value }); render(); }
+  else if (t.id === "importFileInput") { handleFileImport(t.files[0]); }
+}
+
+const appEl = document.getElementById("app");
+appEl.addEventListener("click", handleClick);
+appEl.addEventListener("change", handleChange);
+render();
+</script>
+</body>
+</html>
